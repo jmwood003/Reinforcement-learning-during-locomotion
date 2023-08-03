@@ -96,6 +96,7 @@ disp(['TE mean +/- SD speed (m/s) = ' ...
 
 %% Plot the experiment schedule - Figure 1
 
+%Set colors
 rpe_color = '#c51b7d';
 te_color = '#276419';
 
@@ -103,6 +104,7 @@ te_color = '#276419';
 T_up = ET1.TrgtHi_prct(strcmp(ET1.SID,'VisualFB_20')==1);
 T_down = ET1.TrgtLo_prct(strcmp(ET1.SID,'VisualFB_20')==1);
 
+%Plot 
 schedule_fig = figure('Color', 'w', 'Position', [100, 500, 1500, 500]); 
 axes('Position', [0.1, 0.15, 0.8, 0.7]); hold on
 rectangle('Position',[0, -5, 250, 30],'EdgeColor','none','FaceColor',[0.9,0.9,0.9]);
@@ -118,7 +120,6 @@ set(gca, 'XTick', [250, 300, 390, 1150, 1600], 'XTickLabels', {}, 'FontSize',18,
 text(250/2,21,'Baseline','FontSize',25, 'FontName','Arial', 'HorizontalAlignment', 'center');
 text(median([250 1150]),21,'Learning','FontSize',25, 'FontName','Arial', 'HorizontalAlignment', 'center');
 text(median([1150 1600]),21,'Post-Learning','FontSize',25, 'FontName','Arial', 'HorizontalAlignment', 'center');
-
 text(250/2,-6,'250','FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'center');
 text(median([250 300]),-6,'50','FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'center');
 text(median([300 390]),-6,'90','FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'center');
@@ -137,6 +138,7 @@ text(300,16,'TE: "Hit the target"','FontSize',22, 'FontName','Arial', 'Horizonta
 text(median([1150 1600]),16,{'E1: Washout'; '("Walk Normally")'},'FontSize',22, 'FontName','Arial', 'HorizontalAlignment', 'center');
 text(median([1150 1600]),6,{'E2: Retention'; '("Walk like you did'; 'at the end of learning")'},'FontSize',22, 'FontName','Arial', 'HorizontalAlignment', 'center');
 
+%Save figure
 cd(fig_dir);
 print('Figure_1C','-depsc', '-vector');
 cd(group_dir);
@@ -149,6 +151,7 @@ subjs_to_plot = {'VisualFB_04','VisualFB_10','VisualFB_20',...
 
 plot_random_learning(ET1, subjs_to_plot);
 
+%Save figure
 cd(fig_dir);
 print('Figure_2','-dtiff', '-r300');
 cd(group_dir);
@@ -158,23 +161,26 @@ cd(group_dir);
 clc
 
 %Plots group averaged exeriment 1 and learning data
-anova_T = plot_e1_data(ET1, post_T, hdi_T);
+anova_T = plot_e1_data(ET1);
 
+%Save plot
 cd(fig_dir);
 print('Figure_3','-dtiff', '-r300');
-cd(group_dir);
 
+%Save data for stats
+cd(group_dir);
 writetable(anova_T, 'E1_results_anova');
 
 %% Learning Variability analysis - Figure 4
 
 clc
 
+%Plots learning variability data
 T = [ET1; ET2];
-anova_T_var = plot_learning_variability(T, 50, fig_dir, post_T, hdi_T);
+anova_T_var = plot_learning_variability(T, 50, fig_dir);
 
+%Save table
 cd(group_dir);
-
 writetable(anova_T_var, 'variability_anova');
 
 
@@ -182,10 +188,11 @@ writetable(anova_T_var, 'variability_anova');
 
 clc
 
-E2_ret_anova = plot_e2_data(ET2, fig_dir, post_T, hdi_T);
+%Plots experiment 2 data
+E2_ret_anova = plot_e2_data(ET2, fig_dir);
 
+%Save table
 cd(group_dir);
-
 writetable(E2_ret_anova, 'E2_results_anova');
 
 %% E2 exploratory analysis 
@@ -246,57 +253,7 @@ for i = 1:height(DT)
 
 end
 
-%Step length perception
-percept_str = {'not longer', 'slightly longer', 'longer'};
-tickLabels = {['  not\newlinelonger'],[' slightly\newline  longer'], ['longer']};
 
-fig = figure('Position',[500,500,600,700], 'Color', 'w'); 
-axes('Position', [0.2, 0.55, 0.7, 0.35]); hold on
-for a = 1:length(percept_str)
-
-    rpe_data = imm_ret(strcmp(DT.LSLperception,percept_str{a})==1 & contains(DT.SID,'Reward')==1);
-    te_data = imm_ret(strcmp(DT.LSLperception,percept_str{a})==1 & contains(DT.SID,'Visual')==1);
-
-    x_start_rpe = a-0.3;     x_start_te = a+0.1;
-    line([x_start_rpe a-0.1],[mean(rpe_data), mean(rpe_data)],'LineWidth',4,'Color',rpe_color);
-    line([x_start_te a-0.1],[mean(te_data), mean(te_data)],'LineWidth',4,'Color',te_color);
-    s1 = scatter(ones(length(rpe_data),1)*x_start_rpe, rpe_data,'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor' ,'w', 'SizeData',dot_size);
-    s2 = scatter(ones(length(te_data),1)*x_start_te, te_data,'o','MarkerFaceColor',te_color, 'MarkerEdgeColor' ,'w', 'SizeData',dot_size);
-    alpha(s1,.5); alpha(s2,.5); 
-
-end
-plot(0:5,ones(6,1)*100, 'k--', 'LineWidth',2);
-xlim([0.5 3.5]); ylim([0 200]);
-title('Immediate Retention','FontSize',25,'FontName','Ariel');
-set(gca, 'Xtick',1:3, 'XtickLabel',[],'XTickLabelRotation', 0,'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
-
-%24 hour
-axes('Position', [0.2, 0.1, 0.7, 0.35]); hold on
-for a = 1:length(percept_str)
-
-    rpe_data = ret24(strcmp(DT.LSLperception,percept_str{a})==1 & contains(DT.SID,'Reward')==1);
-    te_data = ret24(strcmp(DT.LSLperception,percept_str{a})==1 & contains(DT.SID,'Visual')==1);
-
-    x_start_rpe = a-0.3;     x_start_te = a+0.1;
-    line([x_start_rpe a-0.1],[mean(rpe_data), mean(rpe_data)],'LineWidth',4,'Color',rpe_color);
-    line([x_start_te a-0.1],[mean(te_data), mean(te_data)],'LineWidth',4,'Color',te_color);
-    s1 = scatter(ones(length(rpe_data),1)*x_start_rpe, rpe_data,'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor' ,'w', 'SizeData',dot_size);
-    s2 = scatter(ones(length(te_data),1)*x_start_te, te_data,'o','MarkerFaceColor',te_color, 'MarkerEdgeColor' ,'w', 'SizeData',dot_size);
-    alpha(s1,.5); alpha(s2,.5); 
-
-end
-plot(0:5,ones(6,1)*100, 'k--', 'LineWidth',2);
-xlim([0.5 3.5]); ylim([0 200]);
-title('24 hour Retention','FontSize',25,'FontName','Ariel');
-set(gca, 'Xtick',1:3, 'XtickLabel',tickLabels,'XTickLabelRotation', 0,'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
-
-han=axes(fig,'visible','off'); 
-han.YLabel.Visible='on';
-ylabel(han,'Percent Retention','FontSize',20,'FontName','Ariel'); 
-
-cd(fig_dir);
-print('Figure_6','-dtiff', '-r300');
-cd(group_dir);
 
 %Make table
 stat_T = table;

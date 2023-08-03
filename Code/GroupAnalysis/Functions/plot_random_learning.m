@@ -3,13 +3,14 @@ function plot_random_learning(T, subjs_to_plot)
 %Get all subject IDs
 subj_IDs = unique(T.SID);
 
-miss_color = '#67a9cf';
-hit_color = '#ef8a62';
-
 %Set up plotting
 figure('Position', [10 200 1500 900], 'Color','w');
 ax_pos = [0.05, 0.6; 0.37, 0.6; 0.7, 0.6;...
     0.05, 0.1; 0.37, 0.1; 0.7, 0.1];
+
+%colors
+miss_color = '#67a9cf';
+hit_color = '#ef8a62';
 
 %Loop through subjects
 for subj_idx = 1:length(subjs_to_plot)

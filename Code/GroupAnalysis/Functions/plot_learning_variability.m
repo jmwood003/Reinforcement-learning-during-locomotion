@@ -1,10 +1,11 @@
-function anova_T = plot_learning_variability(T, BinSize, fig_dir, post_T, hdi_T)
+function anova_T = plot_learning_variability(T, BinSize, fig_dir)
 
+%Find subjects
 subjs = unique(T.SID);
 
-cap_size_eb = 5;
-
+%pre-allocate
 binned_variability = nan(length(subjs),ceil(900/BinSize));
+%Loop through subject
 for s = 1:length(subjs)
 
     %Make an indexing variable for the group
@@ -21,22 +22,21 @@ for s = 1:length(subjs)
         exp_idx(s,1) = 1;
     end
 
-    %-------------------------Baseline variability-------------------------
     %Calculcate baseline variability
     bslidx = find(strcmp(subjs{s},T.SID)==1 & strcmp('baseline',T.phase)==1);
     bsl_LSL = T.prctLSL(bslidx);
     bsl_LSL(isnan(bsl_LSL)==1) = [];
 
+    bsl_var = std(bsl_LSL(end-49:end));
+
+    %Caluclate baseline trial to trial change
     bsl_t2t_change = bsl_LSL(1:end-1) - bsl_LSL(2:end);
     bsl_exp = std(bsl_t2t_change(end-49:end));
 
-    bsl_iqr = iqr(bsl_LSL(end-49:end));
-    
-    %-----------------------Learning phase variability---------------------
-
-    %Index phases
+    %Index learning phases
     lrn_idx = find(strcmp(subjs{s},T.SID)==1 & strcmp('learning',T.phase)==1);
 
+    %Index variables
     lrn_lsl = T.prctLSL(lrn_idx);
     target = T.Trgt_prct(lrn_idx);
     success = T.Success(lrn_idx);
@@ -49,31 +49,30 @@ for s = 1:length(subjs)
 
     %Calculate variability bins
     binned_sd = Bin(lrn_lsl,BinSize,2,'std');
-    binned_variability(s,1:length(binned_sd)) = binned_sd;
+    binned_variability(s,1:length(binned_sd)) = binned_sd/bsl_var;
 
     %Seperate out early and late variability
     maxPerturbIdx = find(target==10);
     ErlyLrnidx = maxPerturbIdx(1:50);
-    var_epochs(s,1:2) = [std(lrn_lsl(ErlyLrnidx)), std(lrn_lsl(end-49:end))];    
+    var_epochs(s,1:2) = [std(lrn_lsl(ErlyLrnidx))/bsl_var, std(lrn_lsl(end-49:end))/bsl_var];    
 
-    %--------------------Win/stay lose shift behavior----------------------
+    %Win/stay lose shift behavior
     start_lrn = find(target==1);
     padded_lsl = [lrn_lsl(start_lrn(1):end); nan];
 
+    %index hits and missed
     hit_idx = find(success(start_lrn(1):end)==1);
     miss_idx = find(success(start_lrn(1):end)==0);
 
+    %calculcate trial to trial change
     hit_t2t_change = padded_lsl(hit_idx+1) - padded_lsl(hit_idx);
     miss_t2t_change = padded_lsl(miss_idx+1) - padded_lsl(miss_idx);
 
+    %calculcate variability after hits and misses
     hit_exp(s,1) = nanstd(hit_t2t_change)/bsl_exp;
     miss_exp(s,1) = nanstd(miss_t2t_change)/bsl_exp;
 
 end
-
-%Group indexing variables
-rpe_idx = find(GrpIdx==1);
-te_idx = find(GrpIdx==2);
 
 %Set colors for plotting
 rpe_color = '#c51b7d';
@@ -83,8 +82,13 @@ te_color = '#276419';
 StartMoving = (50/BinSize)+1;
 MovingLen = (100/BinSize)-1;
 
-%Plot bins
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
 %Experiment 1
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+
+%Plot variability bins
 figure('Position',[0, 100, 900, 800],'Color','w'); 
 axes('Position', [0.1, 0.55, 0.8, 0.4]); hold on
 rectangle('Position',[StartMoving-0.25,0,MovingLen+0.5,10],'FaceColor','none','EdgeColor','k','LineStyle','--','LineWidth',2);
@@ -97,7 +101,7 @@ text(16, 8.2, 'TE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Colo
 text(StartMoving+0.5,9,{'Target'; 'Moving'},'FontSize',16, 'FontName','Arial','Color','k','Rotation',0,'HorizontalAlignment','center','VerticalAlignment','middle');
 set(gca,'FontSize',18, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 title('Learning Variability','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
-ylabel('%LSL change variability (SD)','FontSize',20,'FontName','Ariel'); 
+ylabel('\DeltaLSL variability (SD)','FontSize',20,'FontName','Ariel'); 
 xlabel(['Bin Num (Bin Size=' num2str(BinSize) ')'],'FontSize',20,'FontName','Ariel');
 
 %Plot epochs
@@ -106,24 +110,10 @@ plot(1:2, var_epochs(GrpIdx==1 & exp_idx==1,:),'Color',rpe_color, 'LineWidth',0.
 plot(1:2, var_epochs(GrpIdx==2 & exp_idx==1,:),'Color',te_color, 'LineWidth',0.5);
 plot(1:2, mean(var_epochs(GrpIdx==1 & exp_idx==1,:)),'Color',rpe_color, 'LineWidth',4);
 plot(1:2, mean(var_epochs(GrpIdx==2 & exp_idx==1,:)),'Color',te_color, 'LineWidth',4);
-xlim([0.5, 2.5]); ylim([0 20]);
+xlim([0.5, 2.5]); ylim([0 15]);
 set(gca,'FontSize',18, 'FontName','Arial', 'XTick', [1,2], 'XTickLabel', {'Early','Late'}, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-ylabel('%LSL change variability (SD)','FontSize',18,'FontName','Ariel'); 
+ylabel('\DeltaLSL variability (SD)','FontSize',18,'FontName','Ariel'); 
 title({'Early vs Late'; 'Variability'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
-
-line([1, 2],[18, 18],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e1_variability_interact>0)/height(post_T))*100,1);
-text(1.5, 19.5, [num2str(difference_prob) '%'],'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-text(1.5, 18.5, ['[' num2str(round(hdi_T.e1_variability_interact(1),2)) ' ' num2str(round(hdi_T.e1_variability_interact(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-
-y_loc = (mean(var_epochs(GrpIdx==1 & exp_idx==1,1)) + mean(var_epochs(GrpIdx==2 & exp_idx==1,1)))/2;
-line([.9, .9],[mean(var_epochs(GrpIdx==2 & exp_idx==1,1)), mean(var_epochs(GrpIdx==1 & exp_idx==1,1))],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e1_variability_early>0)/height(post_T))*100,1);
-text(0.7, y_loc, [num2str(difference_prob) '%'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', 90, 'VerticalAlignment','middle');
-text(0.8, y_loc, ['[' num2str(round(hdi_T.e1_variability_early(1),2)) ' ' num2str(round(hdi_T.e1_variability_early(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', 90, 'VerticalAlignment','middle');
 
 %Plot exploration
 axes('Position', [0.6, 0.1, 0.25, 0.3]); hold on
@@ -135,30 +125,23 @@ xlim([0.5, 2.5]); ylim([0, 8]);
 tickLabels = {['    post\newline success'],['post\newline fail']};
 set(gca,'FontSize',18, 'Xtick',1:2,'Xticklabels',tickLabels, 'XTickLabelRotation', 0, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 title({'Win-stay'; 'lose shift'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
-ylabel({'trial-to-trial change'; 'variability (normalized)'},'FontSize',18,'FontName','Ariel'); 
-
-line([1, 2],[7, 7],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e1_wsls_interact>0)/height(post_T))*100,1);
-text(1.5, 7.7, [num2str(difference_prob) '%'],'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-text(1.5, 7.2, ['[' num2str(round(hdi_T.e1_wsls_interact(1),2)) ' ' num2str(round(hdi_T.e1_wsls_interact(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-
-y_loc = (mean(miss_exp(GrpIdx==1 & exp_idx==1,1)) + mean(miss_exp(GrpIdx==2 & exp_idx==1,1)))/2;
-line([2.1, 2.1],[mean(miss_exp(GrpIdx==2 & exp_idx==1,1)), mean(miss_exp(GrpIdx==1 & exp_idx==1,1))],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e1_wsls_late>0)/height(post_T))*100,1);
-text(2.3, y_loc, [num2str(difference_prob) '%'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', -90, 'VerticalAlignment','middle');
-text(2.2, y_loc, ['[' num2str(round(hdi_T.e1_wsls_late(1),2)) ' ' num2str(round(hdi_T.e1_wsls_late(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', -90, 'VerticalAlignment','middle');
+ylabel('\sigma_{trial-to-trial}','FontSize',18,'FontName','Ariel'); 
 
 annotation('textbox',[0.02, 0.81, 0.2, 0.2], 'String', 'A','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0.08, 0.27, 0.2, 0.2], 'String', 'B','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0.53, 0.27, 0.2, 0.2], 'String', 'C','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 
+%save figure
 cd(fig_dir);
 print('Figure_4','-dtiff', '-r300');
 
-%Experiment 2
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+%Experiment 1
+%--------------------------------------------------------------------------
+%--------------------------------------------------------------------------
+
+%Plot variability bins
 figure('Position',[0, 100, 900, 800],'Color','w'); 
 axes('Position', [0.1, 0.55, 0.8, 0.4]); hold on
 rectangle('Position',[StartMoving-0.25,0,MovingLen+0.5,10],'FaceColor','none','EdgeColor','k','LineStyle','--','LineWidth',2);
@@ -171,7 +154,7 @@ text(16, 8.2, 'TE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Colo
 text(StartMoving+0.5,9,{'Target'; 'Moving'},'FontSize',16, 'FontName','Arial','Color','k','Rotation',0,'HorizontalAlignment','center','VerticalAlignment','middle');
 set(gca,'FontSize',18, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 title('Learning Variability - Experiment 2','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
-ylabel('%LSL change variability (SD)','FontSize',20,'FontName','Ariel'); 
+ylabel('\DeltaLSL variability (SD)','FontSize',20,'FontName','Ariel'); 
 xlabel(['Bin Num (Bin Size=' num2str(BinSize) ')'],'FontSize',20,'FontName','Ariel');
 
 %Plot epochs
@@ -182,22 +165,8 @@ plot(1:2, mean(var_epochs(GrpIdx==1 & exp_idx==2,:)),'Color',rpe_color, 'LineWid
 plot(1:2, mean(var_epochs(GrpIdx==2 & exp_idx==2,:)),'Color',te_color, 'LineWidth',4);
 xlim([0.5, 2.5]); ylim([0 10]);
 set(gca,'FontSize',18, 'FontName','Arial', 'XTick', [1,2], 'XTickLabel', {'Early','Late'}, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-ylabel('%LSL change variability (SD)','FontSize',18,'FontName','Ariel'); 
+ylabel('\DeltaLSL variability (SD)','FontSize',18,'FontName','Ariel'); 
 title({'Early vs Late'; 'Variability'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
-
-line([1, 2],[9, 9],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e2_variability_interact>0)/height(post_T))*100,1);
-text(1.5, 9.9, [num2str(difference_prob) '%'],'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-text(1.5, 9.4, ['[' num2str(round(hdi_T.e2_variability_interact(1),2)) ' ' num2str(round(hdi_T.e2_variability_interact(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-
-y_loc = (mean(var_epochs(GrpIdx==1 & exp_idx==2,1)) + mean(var_epochs(GrpIdx==2 & exp_idx==2,1)))/2;
-line([.9, .9],[mean(var_epochs(GrpIdx==2 & exp_idx==2,1)), mean(var_epochs(GrpIdx==1 & exp_idx==2,1))],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e2_variability_early>0)/height(post_T))*100,1);
-text(0.7, y_loc, [num2str(difference_prob) '%'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', 90, 'VerticalAlignment','middle');
-text(0.8, y_loc, ['[' num2str(round(hdi_T.e2_variability_early(1),2)) ' ' num2str(round(hdi_T.e2_variability_early(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', 90, 'VerticalAlignment','middle');
 
 %Plot exploration
 axes('Position', [0.6, 0.1, 0.25, 0.3]); hold on
@@ -208,26 +177,13 @@ plot(1:2,[hit_exp(GrpIdx==2 & exp_idx==2), miss_exp(GrpIdx==2 & exp_idx==2)],'co
 xlim([0.5, 2.5]); ylim([0, 8]);
 set(gca,'FontSize',18, 'Xtick',1:2,'Xticklabels',tickLabels, 'XTickLabelRotation', 0, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 title({'Win-stay'; 'lose shift'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
-ylabel({'trial-to-trial change'; 'variability (normalized)'},'FontSize',18,'FontName','Ariel'); 
-
-line([1, 2],[7, 7],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e2_wsls_interact>0)/height(post_T))*100,1);
-text(1.5, 7.7, [num2str(difference_prob) '%'],'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-text(1.5, 7.3, ['[' num2str(round(hdi_T.e2_wsls_interact(1),2)) ' ' num2str(round(hdi_T.e2_wsls_interact(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-
-y_loc = (mean(miss_exp(GrpIdx==1 & exp_idx==2,1)) + mean(miss_exp(GrpIdx==2 & exp_idx==2,1)))/2;
-line([2.1, 2.1],[mean(miss_exp(GrpIdx==2 & exp_idx==2,1)), mean(miss_exp(GrpIdx==1 & exp_idx==2,1))],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e2_wsls_late>0)/height(post_T))*100,1);
-text(2.3, y_loc, [num2str(difference_prob) '%'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', -90, 'VerticalAlignment','middle');
-text(2.2, y_loc, ['[' num2str(round(hdi_T.e2_wsls_late(1),2)) ' ' num2str(round(hdi_T.e2_wsls_late(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', -90, 'VerticalAlignment','middle');
+ylabel('\sigma_{trial-to-trial}','FontSize',18,'FontName','Ariel'); 
 
 annotation('textbox',[0.02, 0.81, 0.2, 0.2], 'String', 'A','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0.08, 0.27, 0.2, 0.2], 'String', 'B','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0.53, 0.27, 0.2, 0.2], 'String', 'C','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 
+%save figure
 cd(fig_dir);
 print('Figure_S2','-dtiff', '-r300');
 
@@ -235,7 +191,6 @@ print('Figure_S2','-dtiff', '-r300');
 anova_T = table;
 anova_T.variability = [var_epochs(:,1); var_epochs(:,2)];
 anova_T.wsls = [hit_exp; miss_exp];
-% anova_T.iqr = [lrn_iqr; lrn_iqr];
 anova_T.subj_id = [subjs; subjs];
 for i = 1:height(GrpIdx)
     time1{i,1} = 'Early';

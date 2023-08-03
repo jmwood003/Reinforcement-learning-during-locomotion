@@ -125,7 +125,7 @@ for subject_i = 1:length(Subjects)
 
 end
 
-%% Remove data and combine into a large table 
+%% Remove subjects and combine into a large table 
 
 Subjects = {'RewardFB_01','RewardFB_03', 'VisualFB_04','VisualFB_05',...
 'RewardFB_06','RewardFB_07','VisualFB_08','RewardFB_09','VisualFB_10',...
