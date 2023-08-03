@@ -81,7 +81,6 @@ for s = 1:length(subjs)
             Ewsh_RP(s,1) = (mean(WshPC(6:30))/EndLrn(s,1))*100;
             prct_washout(s, 1:length(fullidx)) = (T.prctLSL(fullidx)'./EndLrn(s,1))*100;
 
-            explicit(s,1) = EndLrn(s,1) - mean(WshPC(1:5));
         end            
         
         %Learning measures
@@ -137,7 +136,7 @@ text(1000, 14, 'TE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Col
 xlim([0 length(idxphases)]); ylim([-5 20]);
 set(gca,'FontSize',20, 'FontName','Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 title('Experiment 1','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
-ylabel('%LSL change','FontSize',25,'FontName','Ariel'); 
+ylabel('\DeltaLSL (%)','FontSize',25,'FontName','Ariel'); 
 xlabel('Strides','FontSize',25,'FontName','Ariel');
 
 rectangle('Position',[sum(short_phase(1:2))-50, 0, 50, 15],'FaceColor','none','EdgeColor','k','LineStyle','-','LineWidth',1);
@@ -156,20 +155,13 @@ alpha(s1,.5); alpha(s2,.5);
 xlim([0.5, 2.5]); ylim([0, 16]);
 set(gca,'XTick',[],'FontName','Ariel','FontSize',18, 'Box', 'off', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
 title('Late Learning','FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
-ylabel('%LSL change','FontSize',18,'FontName','Ariel'); 
+ylabel('\DeltaLSL (%)','FontSize',18,'FontName','Ariel'); 
 
 line([1, 2],[14, 14],'LineWidth',1,'Color','k');
 difference_prob = round((sum(post_T.e1_lrn_diff<0)/height(post_T))*100,1);
 text(1.5, 15.5, [num2str(difference_prob) '%'],'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
 text(1.5, 14.5, ['[' num2str(round(hdi_T.e1_lrn_diff(1),2)) ' ' num2str(round(hdi_T.e1_lrn_diff(2),2)) ']'],...
     'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel');
-
-line([1.3, 1.3],[0, mean(EndLrn(rpe_idx))],'LineWidth',1,'Color','k');
-difference_prob = round((sum(post_T.e1_lrn_rpe>0)/height(post_T))*100,1);
-text(1.52, mean(EndLrn(rpe_idx))/2, [num2str(difference_prob) '%'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', -90, 'VerticalAlignment','middle');
-text(1.4, mean(EndLrn(rpe_idx))/2, ['[' num2str(round(hdi_T.e1_lrn_rpe(1),2)) ' ' num2str(round(hdi_T.e1_lrn_rpe(2),2)) ']'],...
-    'HorizontalAlignment','center', 'FontSize', 12, 'FontName', 'Ariel', 'rotation', -90, 'VerticalAlignment','middle');
 
 %Early and late error
 axes('Position', [0.27, 0.05, 0.15, 0.25]); hold on

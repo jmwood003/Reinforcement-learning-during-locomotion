@@ -4,12 +4,12 @@
 close all; clear all; clc;
 
 %Set directories and add paths
-group_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-in-locomotion/Data';
-doc_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-in-locomotion/Docs';
-fig_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-in-locomotion/Docs/Figures';
-addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-in-locomotion/Code/GroupAnalysis');
-addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-in-locomotion/Code/GroupAnalysis/Functions');
-addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-in-locomotion/Code/GroupAnalysis/Functions/helper_functions');
+group_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Data';
+doc_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Docs';
+fig_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Docs/Figures';
+addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis');
+addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis/Functions');
+addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis/Functions/helper_functions');
 addpath('/Users/jonathanwood/Documents/GitHub/analysis_functions');
 
 %Load data 
@@ -19,8 +19,6 @@ DT = readtable("Data_management.xlsx");
 cd(group_dir);
 load('E1data.mat');
 load('E2data.mat');
-post_T = readtable("posterior_contrasts.csv");
-hdi_T = readtable("posterior_hdis.csv");
 
 %% Display demographics
 
@@ -113,7 +111,7 @@ plot(T_up,'k-','LineWidth',2);
 plot(T_down,'k-','LineWidth',2);
 plot(1:length(T_up),zeros(1,length(T_up)),'k', 'LineWidth', 2);
 ylim([-5 20]); xlim([0 1600]); 
-ylabel('%LSL change', 'FontSize', 20, 'FontWeight','normal', 'FontName', 'Ariel');
+ylabel('\DeltaLSL (%)', 'FontSize', 20, 'FontWeight','normal', 'FontName', 'Ariel');
 set(gca, 'XTick', [250, 300, 390, 1150, 1600], 'XTickLabels', {}, 'FontSize',18, 'FontName','Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 
 %Phase text

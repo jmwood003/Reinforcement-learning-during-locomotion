@@ -52,13 +52,13 @@ for subj_idx = 1:length(subjs_to_plot)
     xlim([-10, 910]); ylim([-20, 40]);
     set(gca,'FontSize',20, 'FontName','Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
     if subj_idx==1
-        ylabel('%LSL change','FontSize',25,'FontName','Ariel');
+        ylabel('\DeltaLSL (%)','FontSize',25,'FontName','Ariel');
         text(100, 35, 'Hit', 'Color', hit_color, 'FontSize', 25, 'FontName', 'Ariel', 'HorizontalAlignment', 'left');
         text(100, 30, 'Miss', 'Color', miss_color, 'FontSize', 25, 'FontName', 'Ariel', 'HorizontalAlignment','left');
     elseif subj_idx==2
         title('TE Individuals','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
     elseif subj_idx==4
-        ylabel('%LSL change','FontSize',25,'FontName','Ariel');
+        ylabel('\DeltaLSL (%)','FontSize',25,'FontName','Ariel');
     elseif subj_idx==5
         title('RPE Individuals','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
         xlabel('Learning Steps','FontSize',25,'FontName','Ariel');
