@@ -6,7 +6,7 @@ close all; clear all; clc;
 %Set directories and add paths
 group_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Data';
 doc_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Docs';
-fig_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Docs/Figures';
+fig_dir = '/Users/jonathanwood/Library/CloudStorage/OneDrive-SharedLibraries-UniversityofDelaware-o365/Team-CHS-PT-Morton Lab - RL in Locomotion - Jonathan - RL in Locomotion - Jonathan/Docs/Writing/Manuscript/Figures';
 addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis');
 addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis/Functions');
 addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis/Functions/helper_functions');
@@ -99,6 +99,7 @@ disp(['TE mean +/- SD speed (m/s) = ' ...
 %Set colors
 rpe_color = '#c51b7d';
 te_color = '#276419';
+phase_len_color = '#a6cee3';
 
 %Index targets
 T_up = ET1.TrgtHi_prct(strcmp(ET1.SID,'VisualFB_20')==1);
@@ -107,14 +108,20 @@ T_down = ET1.TrgtLo_prct(strcmp(ET1.SID,'VisualFB_20')==1);
 %Plot 
 schedule_fig = figure('Color', 'w', 'Position', [100, 500, 1500, 500]); 
 axes('Position', [0.1, 0.15, 0.8, 0.7]); hold on
-rectangle('Position',[0, -5, 250, 30],'EdgeColor','none','FaceColor',[0.9,0.9,0.9]);
-rectangle('Position',[1150, -5, 900, 30],'EdgeColor','none','FaceColor',[0.9,0.9,0.9]);
+rectangle('Position',[0, -7, 250, 30],'EdgeColor','none','FaceColor',[0.9,0.9,0.9]);
+rectangle('Position',[1150, -7, 900, 30],'EdgeColor','none','FaceColor',[0.9,0.9,0.9]);
 plot(T_up,'k-','LineWidth',2);
 plot(T_down,'k-','LineWidth',2);
 plot(1:length(T_up),zeros(1,length(T_up)),'k', 'LineWidth', 2);
-ylim([-5 20]); xlim([0 1600]); 
+ylim([-7 20]); xlim([0 1600]); 
 ylabel('\DeltaLSL (%)', 'FontSize', 20, 'FontWeight','normal', 'FontName', 'Ariel');
-set(gca, 'XTick', [250, 300, 390, 1150, 1600], 'XTickLabels', {}, 'FontSize',18, 'FontName','Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
+set(gca, 'XTick', [], 'XTickLabels', [], 'FontSize',18, 'FontName','Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
+
+rectangle('Position',[5, -6.75, 240, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
+rectangle('Position',[255, -6.75, 40, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
+rectangle('Position',[305, -6.75, 80, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
+rectangle('Position',[395, -6.75, 750, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
+rectangle('Position',[1155, -6.75, 885, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
 
 %Phase text
 text(250/2,21,'Baseline','FontSize',25, 'FontName','Arial', 'HorizontalAlignment', 'center');
@@ -124,11 +131,11 @@ text(250/2,-6,'250','FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'c
 text(median([250 300]),-6,'50','FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'center');
 text(median([300 390]),-6,'90','FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'center');
 text(median([390 1150]),-6,'760','FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'center');
-text(median([1150 1600]),-7,{'E1: 900'; 'E2: 750'},'FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'center');
+text(median([1150 1600]),-6,'E1: 900          E2: 25 (d1) 250 (d2)','FontSize',18, 'FontName','Arial', 'HorizontalAlignment', 'center');
 
 %other text
 text(1000,10,'Target zone','FontSize',22, 'FontName','Arial', 'HorizontalAlignment', 'center');
-text(median([1 1600]),-8,'Num. Strides','FontSize',20, 'FontName','Arial', 'HorizontalAlignment', 'center');
+text(median([1 1600]),-8,'Phase Length (Num. Strides)','FontSize',20, 'FontName','Arial', 'HorizontalAlignment', 'center');
 text(median([1 1600]),23,'Experiment 1 and 2 schedule','FontSize',30, 'FontName','Arial', 'FontWeight', 'bold', 'HorizontalAlignment', 'center');
 
 %Instrunction text
@@ -136,7 +143,7 @@ text(250/2,17,{'"Walk'; 'Normally"'},'FontSize',22, 'FontName','Arial', 'Horizon
 text(300,18,'RPE: "Gain as much money as possible"','FontSize',22, 'FontName','Arial', 'HorizontalAlignment', 'left','Color',rpe_color);
 text(300,16,'TE: "Hit the target"','FontSize',22, 'FontName','Arial', 'HorizontalAlignment', 'left','Color',te_color);
 text(median([1150 1600]),16,{'E1: Washout'; '("Walk Normally")'},'FontSize',22, 'FontName','Arial', 'HorizontalAlignment', 'center');
-text(median([1150 1600]),6,{'E2: Retention'; '("Walk like you did'; 'at the end of learning")'},'FontSize',22, 'FontName','Arial', 'HorizontalAlignment', 'center');
+text(median([1150 1600]),6,{'E2: Retention'; '("Walk like the end of'; 'reward/target phase")'},'FontSize',22, 'FontName','Arial', 'HorizontalAlignment', 'center');
 
 %Save figure
 cd(fig_dir);
@@ -173,7 +180,7 @@ writetable(anova_T, 'E1_results_anova');
 
 %% Learning Variability analysis - Figure 4
 
-clc
+clc;
 
 %Plots learning variability data
 T = [ET1; ET2];

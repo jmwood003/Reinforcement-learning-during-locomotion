@@ -170,7 +170,7 @@ plot(1:2, mean(error(rpe_idx,:)),'Color',rpe_color, 'LineWidth',4);
 plot(1:2, mean(error(te_idx,:)),'Color',te_color, 'LineWidth',4);
 xlim([0.5, 2.5]); ylim([0 15]); 
 set(gca,'FontSize',18, 'FontName','Arial', 'XTick', [1,2], 'XTickLabel', {'Early','Late'}, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-ylabel('Error (%)','FontSize',18,'FontName','Ariel');
+ylabel('\DeltaLSL Error (%)','FontSize',18,'FontName','Ariel');
 title({'Early vs Late'; 'Error'},'FontWeight','normal','FontSize',20,'FontName','Ariel');
 
 %Early and late percent success

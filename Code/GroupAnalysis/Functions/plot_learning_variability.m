@@ -98,11 +98,11 @@ set(s1.edge,'LineStyle','none'); set(s2.edge,'LineStyle','none')
 ylim([0 10]); xlim([1 size(binned_variability,2)]);
 text(16, 9, 'RPE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color',rpe_color);
 text(16, 8.2, 'TE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color',te_color);
-text(StartMoving+0.5,9,{'Target'; 'Moving'},'FontSize',16, 'FontName','Arial','Color','k','Rotation',0,'HorizontalAlignment','center','VerticalAlignment','middle');
+text(StartMoving+0.5,9,{'Gadual'; 'Target'; 'Shift'},'FontSize',16, 'FontName','Arial','Color','k','Rotation',0,'HorizontalAlignment','center','VerticalAlignment','middle');
 set(gca,'FontSize',18, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 title('Learning Variability','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
-ylabel('\DeltaLSL variability (SD)','FontSize',20,'FontName','Ariel'); 
-xlabel(['Bin Num (Bin Size=' num2str(BinSize) ')'],'FontSize',20,'FontName','Ariel');
+ylabel('\sigma_{\DeltaLSL}','FontSize',25,'FontName','Ariel'); 
+xlabel(['Strides (bins of ' num2str(BinSize) ')'],'FontSize',20,'FontName','Ariel');
 
 %Plot epochs
 axes('Position', [0.15, 0.1, 0.25, 0.3]); hold on
@@ -112,20 +112,20 @@ plot(1:2, mean(var_epochs(GrpIdx==1 & exp_idx==1,:)),'Color',rpe_color, 'LineWid
 plot(1:2, mean(var_epochs(GrpIdx==2 & exp_idx==1,:)),'Color',te_color, 'LineWidth',4);
 xlim([0.5, 2.5]); ylim([0 15]);
 set(gca,'FontSize',18, 'FontName','Arial', 'XTick', [1,2], 'XTickLabel', {'Early','Late'}, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-ylabel('\DeltaLSL variability (SD)','FontSize',18,'FontName','Ariel'); 
+ylabel('\sigma_{\DeltaLSL}','FontSize',25,'FontName','Ariel'); 
 title({'Early vs Late'; 'Variability'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
 
 %Plot exploration
 axes('Position', [0.6, 0.1, 0.25, 0.3]); hold on
-plot(1:2,[mean(hit_exp(GrpIdx==1 & exp_idx==1)), mean(miss_exp(GrpIdx==1 & exp_idx==1))],'LineWidth',4,'Color',rpe_color);
 plot(1:2,[hit_exp(GrpIdx==1 & exp_idx==1), miss_exp(GrpIdx==1 & exp_idx==1)],'color',rpe_color, 'LineWidth', 0.5);
-plot(1:2,[mean(hit_exp(GrpIdx==2 & exp_idx==1)), mean(miss_exp(GrpIdx==2 & exp_idx==1))],'LineWidth',4,'Color',te_color);
 plot(1:2,[hit_exp(GrpIdx==2 & exp_idx==1), miss_exp(GrpIdx==2 & exp_idx==1)],'color',te_color, 'LineWidth', 0.5);
+plot(1:2,[mean(hit_exp(GrpIdx==1 & exp_idx==1)), mean(miss_exp(GrpIdx==1 & exp_idx==1))],'LineWidth',4,'Color',rpe_color);
+plot(1:2,[mean(hit_exp(GrpIdx==2 & exp_idx==1)), mean(miss_exp(GrpIdx==2 & exp_idx==1))],'LineWidth',4,'Color',te_color);
 xlim([0.5, 2.5]); ylim([0, 8]);
 tickLabels = {['    post\newline success'],['post\newline fail']};
 set(gca,'FontSize',18, 'Xtick',1:2,'Xticklabels',tickLabels, 'XTickLabelRotation', 0, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-title({'Win-stay'; 'lose shift'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
-ylabel('\sigma_{trial-to-trial}','FontSize',18,'FontName','Ariel'); 
+title({'Win-Stay/'; 'Lose Shift'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
+ylabel('\sigma_{trial-to-trial}','FontSize',25,'FontName','Ariel'); 
 
 annotation('textbox',[0.02, 0.81, 0.2, 0.2], 'String', 'A','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0.08, 0.27, 0.2, 0.2], 'String', 'B','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
@@ -137,7 +137,7 @@ print('Figure_4','-dtiff', '-r300');
 
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
-%Experiment 1
+%Experiment 2
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -151,11 +151,11 @@ set(s1.edge,'LineStyle','none'); set(s2.edge,'LineStyle','none')
 ylim([0 10]); xlim([1 size(binned_variability,2)]);
 text(16, 9, 'RPE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color',rpe_color);
 text(16, 8.2, 'TE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color',te_color);
-text(StartMoving+0.5,9,{'Target'; 'Moving'},'FontSize',16, 'FontName','Arial','Color','k','Rotation',0,'HorizontalAlignment','center','VerticalAlignment','middle');
+text(StartMoving+0.5,9,{'Gadual'; 'Target'; 'Shift'},'FontSize',16, 'FontName','Arial','Color','k','Rotation',0,'HorizontalAlignment','center','VerticalAlignment','middle');
 set(gca,'FontSize',18, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 title('Learning Variability - Experiment 2','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
-ylabel('\DeltaLSL variability (SD)','FontSize',20,'FontName','Ariel'); 
-xlabel(['Bin Num (Bin Size=' num2str(BinSize) ')'],'FontSize',20,'FontName','Ariel');
+ylabel('\sigma_{\DeltaLSL}','FontSize',25,'FontName','Ariel'); 
+xlabel(['Strides (bins of ' num2str(BinSize) ')'],'FontSize',20,'FontName','Ariel');
 
 %Plot epochs
 axes('Position', [0.15, 0.1, 0.25, 0.3]); hold on
@@ -165,19 +165,19 @@ plot(1:2, mean(var_epochs(GrpIdx==1 & exp_idx==2,:)),'Color',rpe_color, 'LineWid
 plot(1:2, mean(var_epochs(GrpIdx==2 & exp_idx==2,:)),'Color',te_color, 'LineWidth',4);
 xlim([0.5, 2.5]); ylim([0 10]);
 set(gca,'FontSize',18, 'FontName','Arial', 'XTick', [1,2], 'XTickLabel', {'Early','Late'}, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-ylabel('\DeltaLSL variability (SD)','FontSize',18,'FontName','Ariel'); 
+ylabel('\sigma_{\DeltaLSL}','FontSize',25,'FontName','Ariel'); 
 title({'Early vs Late'; 'Variability'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
 
 %Plot exploration
 axes('Position', [0.6, 0.1, 0.25, 0.3]); hold on
-plot(1:2,[mean(hit_exp(GrpIdx==1 & exp_idx==2)), mean(miss_exp(GrpIdx==1 & exp_idx==2))],'LineWidth',4,'Color',rpe_color);
 plot(1:2,[hit_exp(GrpIdx==1 & exp_idx==2), miss_exp(GrpIdx==1 & exp_idx==2)],'color',rpe_color, 'LineWidth', 0.5);
-plot(1:2,[mean(hit_exp(GrpIdx==2 & exp_idx==2)), mean(miss_exp(GrpIdx==2 & exp_idx==2))],'LineWidth',4,'Color',te_color);
 plot(1:2,[hit_exp(GrpIdx==2 & exp_idx==2), miss_exp(GrpIdx==2 & exp_idx==2)],'color',te_color, 'LineWidth', 0.5);
+plot(1:2,[mean(hit_exp(GrpIdx==2 & exp_idx==2)), mean(miss_exp(GrpIdx==2 & exp_idx==2))],'LineWidth',4,'Color',te_color);
+plot(1:2,[mean(hit_exp(GrpIdx==1 & exp_idx==2)), mean(miss_exp(GrpIdx==1 & exp_idx==2))],'LineWidth',4,'Color',rpe_color);
 xlim([0.5, 2.5]); ylim([0, 8]);
 set(gca,'FontSize',18, 'Xtick',1:2,'Xticklabels',tickLabels, 'XTickLabelRotation', 0, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-title({'Win-stay'; 'lose shift'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
-ylabel('\sigma_{trial-to-trial}','FontSize',18,'FontName','Ariel'); 
+title({'Win-Stay/'; 'Lose Shift'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
+ylabel('\sigma_{trial-to-trial}','FontSize',25,'FontName','Ariel'); 
 
 annotation('textbox',[0.02, 0.81, 0.2, 0.2], 'String', 'A','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0.08, 0.27, 0.2, 0.2], 'String', 'B','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);

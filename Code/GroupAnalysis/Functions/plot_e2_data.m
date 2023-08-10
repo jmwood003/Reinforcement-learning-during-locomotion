@@ -122,49 +122,52 @@ te_color = '#276419';
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
+space = 50;
+
 %All strides
 figure('Position',[0,200,1300,800],'Color','w'); 
 axes('Position', [0.15, 0.55, 0.7, 0.4]); hold on
 rectangle('Position',[1, -40, short_phase(1), 80], 'FaceColor',[0.9 0.9 0.9],'EdgeColor','none');
-rectangle('Position',[sum(short_phase(1:2)), -40, sum(short_phase(3:4))+25, 80], 'FaceColor',[0.9 0.9 0.9],'EdgeColor','none');
-rectangle('Position',[sum(short_phase(1:3))+1, -5, 23, 25], 'FaceColor',[0.9 0.9 0.9],'EdgeColor','k', 'LineWidth', 1.5);
-s1 = shadedErrorBar(1:sum(short_phase(1:3)), nanmean(prctSL_change(rpe_idx,1:sum(short_phase(1:3)))), SEM(prctSL_change(rpe_idx,1:sum(short_phase(1:3))),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1.5});
-s2 = shadedErrorBar(1:sum(short_phase(1:3)), nanmean(prctSL_change(te_idx,1:sum(short_phase(1:3)))), SEM(prctSL_change(te_idx,1:sum(short_phase(1:3))),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1.5});
+rectangle('Position',[sum(short_phase(1:2)), -40, sum(short_phase(3:4))+space, 80], 'FaceColor',[0.9 0.9 0.9],'EdgeColor','none');
+s1 = shadedErrorBar(1:sum(short_phase(1:3)), nanmean(prctSL_change(rpe_idx,1:sum(short_phase(1:3)))), SEM(prctSL_change(rpe_idx,1:sum(short_phase(1:3))),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
+s2 = shadedErrorBar(1:sum(short_phase(1:3)), nanmean(prctSL_change(te_idx,1:sum(short_phase(1:3)))), SEM(prctSL_change(te_idx,1:sum(short_phase(1:3))),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
 set(s1.edge,'LineStyle','none'); set(s2.edge,'LineStyle','none');
 plot(1:sum(short_phase(1:2)),mean(Target(:,1:sum(short_phase(1:2)))),'k--','linewidth',1.5);
-s3 = shadedErrorBar(sum(short_phase(1:3))+25:length(idxphases)+24,nanmean(prctSL_change(rpe_idx,sum(short_phase(1:3))+1:end)),SEM(prctSL_change(rpe_idx,sum(short_phase(1:3))+1:end),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1.5});
-s4 = shadedErrorBar(sum(short_phase(1:3))+25:length(idxphases)+24,nanmean(prctSL_change(te_idx,sum(short_phase(1:3))+1:end)),SEM(prctSL_change(te_idx,sum(short_phase(1:3))+1:end),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1.5});
+s3 = shadedErrorBar(sum(short_phase(1:3))+space+3:length(idxphases)+space+2,nanmean(prctSL_change(rpe_idx,sum(short_phase(1:3))+1:end)),SEM(prctSL_change(rpe_idx,sum(short_phase(1:3))+1:end),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
+s4 = shadedErrorBar(sum(short_phase(1:3))+space+3:length(idxphases)+space+2,nanmean(prctSL_change(te_idx,sum(short_phase(1:3))+1:end)),SEM(prctSL_change(te_idx,sum(short_phase(1:3))+1:end),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
 set(s3.edge,'LineStyle','none'); set(s4.edge,'LineStyle','none');
-plot(1:length(idxphases)+25,zeros(1,length(idxphases)+25),'k','linewidth',1.5);
+plot(1:length(idxphases)+space,zeros(1,length(idxphases)+space),'k','linewidth',1.5);
+rectangle('Position',[sum(short_phase(1:3))+5, -10, space-10, 50], 'FaceColor','w','EdgeColor','none', 'LineWidth', 1);
 xlim([0 length(idxphases)]); ylim([-5 20]);
 text(1000, 16, 'RPE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color',rpe_color);
 text(1000, 14.5, 'TE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color',te_color);
 text(median(find(idxphases==1)),19,'Baseline','FontName','Arial','FontSize',25, 'HorizontalAlignment','center'); 
 text(median(find(idxphases==2)),19,'Learning','FontName','Arial','FontSize',25, 'HorizontalAlignment','center'); 
-text(median(find(idxphases==4)),19,'Retention','FontName','Arial','FontSize',25, 'HorizontalAlignment','center'); 
-text(sum(short_phase(1:3))+12, 10, '24-hour break', 'Rotation',90, 'FontSize', 15,'Color','k', 'HorizontalAlignment','center','VerticalAlignment','middle');
+text(median(find(idxphases==4))+10,19,'Retention','FontName','Arial','FontSize',25, 'HorizontalAlignment','center'); 
+text(sum(short_phase(1:3))+25, 10, '24-hour break', 'Rotation',90, 'FontSize', 20,'Color','k', 'HorizontalAlignment','center','VerticalAlignment','middle');
 set(gca,'FontSize',18, 'FontName','Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 title('Experiment 2','FontSize',25,'FontName','Ariel');
 xlabel('Strides','FontSize',25,'FontName','Ariel');
 ylabel('\DeltaLSL (%)','FontSize',25,'FontName','Ariel'); 
+annotation('rectangle',[0.73, 0.545, 0.0195, 0.05], 'FaceColor','w','EdgeColor','w');
 
 space = 40;
 
 %Retention percent all strides
 axes('Position', [0.05, 0.05, 0.35, 0.35]); hold on
-rectangle('Position',[0, 0, short_phase(3), 200], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1.5);
-rectangle('Position',[space+1, 0, 25, 200], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1.5);
-s1 = shadedErrorBar(1:short_phase(3), nanmean(prct_retention_5(rpe_idx,:)), SEM(prct_retention_5(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1.5});
-s2 = shadedErrorBar(1:short_phase(3), nanmean(prct_retention_5(te_idx,:)), SEM(prct_retention_5(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1.5});
+rectangle('Position',[0, 25, short_phase(3), 150], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
+rectangle('Position',[space+1, 25, 25, 150], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
+s1 = shadedErrorBar(1:short_phase(3), nanmean(prct_retention_5(rpe_idx,:)), SEM(prct_retention_5(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
+s2 = shadedErrorBar(1:short_phase(3), nanmean(prct_retention_5(te_idx,:)), SEM(prct_retention_5(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
 set(s1.edge,'LineStyle','none'); set(s2.edge,'LineStyle','none');
 plot(1:short_phase(3),ones(1,short_phase(3))*100,'k--','linewidth',1.5);
-s3 = shadedErrorBar([1:short_phase(4)]+space, nanmean(prct_retention_24(rpe_idx,:)), SEM(prct_retention_24(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1.5});
-s4 = shadedErrorBar([1:short_phase(4)]+space, nanmean(prct_retention_24(te_idx,:)), SEM(prct_retention_24(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1.5});
+s3 = shadedErrorBar([1:short_phase(4)]+space, nanmean(prct_retention_24(rpe_idx,:)), SEM(prct_retention_24(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
+s4 = shadedErrorBar([1:short_phase(4)]+space, nanmean(prct_retention_24(te_idx,:)), SEM(prct_retention_24(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
 set(s3.edge,'LineStyle','none'); set(s4.edge,'LineStyle','none');
 plot([1:short_phase(4)]+space,ones(1,short_phase(4))*100,'k--','linewidth',1.5);
 xlim([0, short_phase(4)+space+100]); ylim([0, 200]);
 set(gca,'Box', 'off', 'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
-ylabel('Explicit retention (%)','FontSize',18,'FontName','Ariel', 'FontWeight','normal');
+ylabel('Explicit Retention (%)','FontSize',18,'FontName','Ariel', 'FontWeight','normal');
 title('Retention Phase','FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
 text(short_phase(3)+8, 100, '24-hour break', 'Rotation',90, 'FontSize', 15,'Color','k', 'HorizontalAlignment', 'center', 'VerticalAlignment','middle');
 
@@ -190,21 +193,20 @@ errorbar(2.2, mean(mean_pR24(te_idx)), SEM(mean_pR24(te_idx),1),'LineWidth',1.5,
 alpha(s1,.5); alpha(s2,.5); alpha(s3,.5); alpha(s4,.5); 
 xlim([0.5, 2.5]); ylim([0, 250]);
 set(gca,'XTick',[1,2],'XTickLabel',{'Immediate', '24-hour'},'Box', 'off', 'FontName','Ariel','FontSize',14, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
-title('Epochs','FontSize',16,'FontName','Ariel', 'FontWeight', 'normal');
 
 %Retention error all strides
 axes('Position', [0.55, 0.05, 0.35, 0.35]); hold on
-rectangle('Position',[0, 0, short_phase(3), 10], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1.5);
-rectangle('Position',[space+1, 0, 25, 10], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1.5);
-s1 = shadedErrorBar(1:short_phase(3), nanmean(retention_err_5(rpe_idx,:)), SEM(retention_err_5(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1.5});
-s2 = shadedErrorBar(1:short_phase(3), nanmean(retention_err_5(te_idx,:)), SEM(retention_err_5(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1.5});
+rectangle('Position',[0, 1, short_phase(3), 8], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
+rectangle('Position',[space+1, 1, 25, 8], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
+s1 = shadedErrorBar(1:short_phase(3), nanmean(retention_err_5(rpe_idx,:)), SEM(retention_err_5(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
+s2 = shadedErrorBar(1:short_phase(3), nanmean(retention_err_5(te_idx,:)), SEM(retention_err_5(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
 set(s1.edge,'LineStyle','none'); set(s2.edge,'LineStyle','none');
-s3 = shadedErrorBar([1:short_phase(4)]+space, nanmean(retention_err_24(rpe_idx,:)), SEM(retention_err_24(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1.5});
-s4 = shadedErrorBar([1:short_phase(4)]+space, nanmean(retention_err_24(te_idx,:)), SEM(retention_err_24(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1.5});
+s3 = shadedErrorBar([1:short_phase(4)]+space, nanmean(retention_err_24(rpe_idx,:)), SEM(retention_err_24(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
+s4 = shadedErrorBar([1:short_phase(4)]+space, nanmean(retention_err_24(te_idx,:)), SEM(retention_err_24(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
 set(s3.edge,'LineStyle','none'); set(s4.edge,'LineStyle','none');
 xlim([0, short_phase(4)+space+100]); ylim([0, 10]);
 set(gca,'Box', 'off', 'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
-ylabel('Retention error (%)','FontSize',18,'FontName','Ariel'); 
+ylabel('\DeltaLSL Retention Error (%)','FontSize',18,'FontName','Ariel'); 
 title('Retention Phase','FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
 text(short_phase(3)+8, 5, '24-hour break', 'Rotation',90, 'FontSize', 15,'Color','k', 'HorizontalAlignment', 'center', 'VerticalAlignment','middle');
 
@@ -229,7 +231,7 @@ errorbar(2.2, mean(Mean_absR24(te_idx)), SEM(Mean_absR24(te_idx),1),'LineWidth',
 alpha(s1,.5); alpha(s2,.5); alpha(s3,.5); alpha(s4,.5); 
 xlim([0.5, 2.5]); ylim([0, 10]);
 set(gca,'XTick',[1,2],'XTickLabel',{'Immediate', '24-hour'},'Box', 'off', 'FontName','Ariel','FontSize',14, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
-title('Epochs','FontSize',16,'FontName','Ariel', 'FontWeight', 'normal');
+% title('Epochs','FontSize',16,'FontName','Ariel', 'FontWeight', 'normal');
 
 annotation('textbox',[0, 0.81, 0.2, 0.2], 'String', 'A','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0, 0.27, 0.2, 0.2], 'String', 'B','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
@@ -269,7 +271,7 @@ plot(1:2, mean(error(rpe_idx,:)),'Color',rpe_color, 'LineWidth',4);
 plot(1:2, mean(error(te_idx,:)),'Color',te_color, 'LineWidth',4);
 xlim([0.5, 2.5]); ylim([0 15]); 
 set(gca,'FontSize',18, 'FontName','Arial', 'XTick', [1,2], 'XTickLabel', {'Early','Late'}, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-ylabel('Error (%)','FontSize',18,'FontName','Ariel');
+ylabel('\DeltaLSL Error (%)','FontSize',18,'FontName','Ariel');
 title({'Early vs Late'; 'Error'},'FontWeight','normal','FontSize',20,'FontName','Ariel');
 
 %Early and late percent success
