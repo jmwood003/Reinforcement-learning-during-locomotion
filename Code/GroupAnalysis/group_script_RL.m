@@ -121,7 +121,7 @@ rectangle('Position',[5, -6.75, 240, 1.5],'EdgeColor','none','FaceColor',phase_l
 rectangle('Position',[255, -6.75, 40, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
 rectangle('Position',[305, -6.75, 80, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
 rectangle('Position',[395, -6.75, 750, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
-rectangle('Position',[1155, -6.75, 885, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
+rectangle('Position',[1155, -6.75, 440, 1.5],'EdgeColor','none','FaceColor',phase_len_color);
 
 %Phase text
 text(250/2,21,'Baseline','FontSize',25, 'FontName','Arial', 'HorizontalAlignment', 'center');
@@ -190,7 +190,6 @@ anova_T_var = plot_learning_variability(T, 50, fig_dir);
 cd(group_dir);
 writetable(anova_T_var, 'variability_anova');
 
-
 %% Group averaged data (e2) - Figures 5
 
 clc
@@ -202,10 +201,7 @@ E2_ret_anova = plot_e2_data(ET2, fig_dir);
 cd(group_dir);
 writetable(E2_ret_anova, 'E2_results_anova');
 
-%% Matching variability
-
-rpe_color = '#c51b7d';
-te_color = '#276419';
+%% Matching variability (experiment 1 washout post-hoc analysis)
 
 grp_str = {}; 
 subjects = unique(ET1.SID);
@@ -222,43 +218,52 @@ for i = 1:length(subjects)
     lrn_idx = find(strcmp(ET1.SID,subjects{i})==1 & strcmp(ET1.phase,'learning')==1);
     wsh_idx = find(strcmp(ET1.SID,subjects{i})==1 & strcmp(ET1.phase,'washout')==1);
 
-    %index success during learning
+    %index variability during learning
     lrn_steady_trgt_idx = find(ET1.Trgt_prct(lrn_idx)==10);
     variability(i,1) = nanstd(ET1.prctLSL(lrn_idx(lrn_steady_trgt_idx)));
 
-    wsh_lsl = ET1.prctLSL(wsh_idx);
-    wsh_lsl(isnan(wsh_lsl)==1) = [];
+    %index success during learning
+    success = ET1.Success(lrn_idx(lrn_steady_trgt_idx));
+    success(isnan(success)==1) = [];
+    p_success(i,1) = (sum(success)/length(success))*100;
 
+    %End of learning
     lrn_lsl = ET1.prctLSL(lrn_idx);
     lrn_lsl(isnan(lrn_lsl)==1) = [];
     end_lrn = mean(lrn_lsl(end-49:end));
 
+    %Washout
+    wsh_lsl = ET1.prctLSL(wsh_idx);
+    wsh_lsl(isnan(wsh_lsl)==1) = [];
+
+    %Washout epochs
     init_wsh(i,1) = (mean(wsh_lsl(1:5))/end_lrn)*100;
     early_wsh(i,1) = (mean(wsh_lsl(6:30))/end_lrn)*100;
 
 end
 
+%Plot prep
+cap_size_eb = 5; dot_size = 50;
+
+rpe_color = '#c51b7d';
+te_color = '#276419';
+
+%Seperate outcomes by group
 rpe_var = variability(strcmp(grp_str,'rpe')==1);
 te_var = variability(strcmp(grp_str,'te')==1);
+rpe_success = p_success(strcmp(grp_str,'rpe')==1);
+te_success = p_success(strcmp(grp_str,'te')==1);
+rpe_iw = init_wsh(strcmp(grp_str,'rpe')==1);
+te_iw = init_wsh(strcmp(grp_str,'te')==1);
+rpe_ew = early_wsh(strcmp(grp_str,'rpe')==1);
+te_ew = early_wsh(strcmp(grp_str,'te')==1);
 
-clear min_idx
-for i = 1:length(rpe_var)
-    [min_val(i,1), min_idx(i,1)] = min(abs(rpe_var(i) - te_var));
+%Match the particiapnts by variability
+[var_match_rpe, var_match_te] = unique_matches(rpe_var, te_var);
 
-    %If repeats find which one is smaller
-    if sum(min_idx(i)==min_idx)>1
-        repeat_idx = find(min_idx==min_idx(i));
-        [~,larger] = max(min_val(repeat_idx));
-        min_idx(repeat_idx(larger)) = nan;
-    end
-end
-
-rpe_match = find(isnan(min_idx)==0);
-te_match = min_idx;
-te_match(isnan(te_match)==1) = [];
-
+%plot the matches
 figure('Color', 'w'); hold on
-plot([0.9 1.1], [rpe_var(rpe_match) te_var(te_match)], 'k');
+plot([0.9 1.1], [rpe_var(var_match_rpe) te_var(var_match_te)], 'k');
 plot(1-0.1,rpe_var,'o', 'MarkerEdgeColor','w', 'MarkerFaceColor',rpe_color, 'MarkerSize',8);
 plot(1+0.1,te_var,'o', 'MarkerEdgeColor','w', 'MarkerFaceColor',te_color, 'MarkerSize',8);
 xlim([0.85 1.15]); ylim([0 6]);
@@ -266,41 +271,120 @@ text(1, 5, 'Matched Values', 'FontSize', 15, 'HorizontalAlignment', 'center');
 title('Matched Variability'); ylabel('Learning Variability'); 
 set(gca, 'XTick', [0.9, 1.1], 'XTickLabels', {'RPE', 'TE'}, 'FontSize',18, 'FontName','Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 
-rpe_iw = init_wsh(strcmp(grp_str,'rpe')==1);
-te_iw = init_wsh(strcmp(grp_str,'te')==1);
-rpe_ew = early_wsh(strcmp(grp_str,'rpe')==1);
-te_ew = early_wsh(strcmp(grp_str,'te')==1);
-
-%Plot implicit aftereffect
-x_jitter_rpe = normrnd(0.75,0.01,length(rpe_match),1);
-x_jitter_te = normrnd(1.15,0.01,length(te_match),1);
-cap_size_eb = 5; dot_size = 50;
+%Plot the washout
+x_jitter_rpe = normrnd(0.75,0.01,length(var_match_rpe),1);
+x_jitter_te = normrnd(1.15,0.01,length(var_match_te),1);
 
 figure('Color', 'w'); hold on
 plot(0:4,zeros(5,1),'k-','LineWidth',1);
-line([0.65, 0.95],[mean(rpe_iw(rpe_match)), mean(rpe_iw(rpe_match))],'LineWidth',4,'Color',rpe_color);
-line([1.05, 1.35],[mean(te_iw(te_match)), mean(te_iw(te_match))],'LineWidth',4,'Color',te_color);
-errorbar(0.8, mean(rpe_iw(rpe_match)), SEM(rpe_iw(rpe_match),1),'LineWidth',2,'Color',rpe_color, 'CapSize',cap_size_eb)
-errorbar(1.2, mean(te_iw(te_match)), SEM(te_iw(te_match),1),'LineWidth',2,'Color',te_color, 'CapSize',cap_size_eb)
-s1 = scatter(x_jitter_rpe, rpe_iw(rpe_match),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
-s2 = scatter(x_jitter_te, te_iw(te_match),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
-line([0.65, 0.95]+1,[mean(rpe_ew(rpe_match)), mean(rpe_ew(rpe_match))],'LineWidth',4,'Color',rpe_color);
-line([1.05, 1.35]+1,[mean(te_ew(te_match)), mean(te_ew(te_match))],'LineWidth',4,'Color',te_color);
-s3 = scatter(x_jitter_rpe+1, rpe_ew(rpe_match),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
-s4 = scatter(x_jitter_te+1, te_ew(te_match),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
-errorbar(1.8, mean(rpe_ew(rpe_match)), SEM(rpe_ew(rpe_match),1),'LineWidth',2,'Color',rpe_color, 'CapSize',cap_size_eb)
-errorbar(2.2, mean(te_ew(te_match)), SEM(te_ew(te_match),1),'LineWidth',2,'Color',te_color, 'CapSize',cap_size_eb)
+line([0.65, 0.95],[mean(rpe_iw(var_match_rpe)), mean(rpe_iw(var_match_rpe))],'LineWidth',4,'Color',rpe_color);
+line([1.05, 1.35],[mean(te_iw(var_match_te)), mean(te_iw(var_match_te))],'LineWidth',4,'Color',te_color);
+errorbar(0.8, mean(rpe_iw(var_match_rpe)), SEM(rpe_iw(var_match_rpe),1),'LineWidth',2,'Color',rpe_color, 'CapSize',cap_size_eb)
+errorbar(1.2, mean(te_iw(var_match_te)), SEM(te_iw(var_match_te),1),'LineWidth',2,'Color',te_color, 'CapSize',cap_size_eb)
+s1 = scatter(x_jitter_rpe, rpe_iw(var_match_rpe),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+s2 = scatter(x_jitter_te, te_iw(var_match_te),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+line([0.65, 0.95]+1,[mean(rpe_ew(var_match_rpe)), mean(rpe_ew(var_match_rpe))],'LineWidth',4,'Color',rpe_color);
+line([1.05, 1.35]+1,[mean(te_ew(var_match_te)), mean(te_ew(var_match_te))],'LineWidth',4,'Color',te_color);
+s3 = scatter(x_jitter_rpe+1, rpe_ew(var_match_rpe),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+s4 = scatter(x_jitter_te+1, te_ew(var_match_te),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+errorbar(1.8, mean(rpe_ew(var_match_rpe)), SEM(rpe_ew(var_match_rpe),1),'LineWidth',2,'Color',rpe_color, 'CapSize',cap_size_eb)
+errorbar(2.2, mean(te_ew(var_match_te)), SEM(te_ew(var_match_te),1),'LineWidth',2,'Color',te_color, 'CapSize',cap_size_eb)
 alpha(s1,.5); alpha(s2,.5); alpha(s3,.5); alpha(s4,.5); 
 xlim([0.5, 2.5]); %ylim([-100, 100]);
 set(gca,'XTick',[1,2],'XTickLabel',{'Initial', 'Early'},'Box', 'off', 'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
 ylabel('Percent retention','FontSize',20,'FontName','Ariel', 'FontWeight','normal');
 title('Implicit Aftereffect - Matched','FontWeight','normal','FontSize',25,'FontName','Ariel', 'Color', 'k');
 
-var_match_T = table;
-var_match_T.init_wsh = [init_wsh(rpe_match); init_wsh(te_match)];
-var_match_T.early_wsh = [early_wsh(rpe_match); early_wsh(te_match)];
-var_match_T.variability = [rpe_var(rpe_match); rpe_var(te_match)];
-var_match_T.group = [grp_str(1:length(rpe_match)); grp_str(16:16+length(te_match)-1)];
+%Plot matched groups against reward
+figure('Color', 'w'); hold on
+plot(0:4,zeros(5,1),'k-','LineWidth',1);
+line([0.65, 0.95],[mean(rpe_success(var_match_rpe)), mean(rpe_success(var_match_rpe))],'LineWidth',4,'Color',rpe_color);
+line([1.05, 1.35],[mean(te_success(var_match_te)), mean(te_success(var_match_te))],'LineWidth',4,'Color',te_color);
+errorbar(0.8, mean(rpe_success(var_match_rpe)), SEM(rpe_success(var_match_rpe),1),'LineWidth',2,'Color',rpe_color, 'CapSize',cap_size_eb)
+errorbar(1.2, mean(te_success(var_match_te)), SEM(te_success(var_match_te),1),'LineWidth',2,'Color',te_color, 'CapSize',cap_size_eb)
+s1 = scatter(x_jitter_rpe, rpe_success(var_match_rpe),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+s2 = scatter(x_jitter_te, te_success(var_match_te),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+xlim([0.5, 1.5]); %ylim([-100, 100]);
+title('Matched Groups'); ylabel('Learning Success'); 
+set(gca, 'XTick', [0.9, 1.1], 'XTickLabels', {'RPE', 'TE'}, 'FontSize',18, 'FontName','Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 
+for i = 1:length(var_match_rpe)*2
+    time1{i,1} = 'Initial';
+    time2{i,1} = 'Early';
+end
+
+%Make table for comparison
+var_match_T = table;
+var_match_T.subj_id = [subjects(var_match_rpe); subjects(var_match_te); subjects(var_match_rpe); subjects(var_match_te)];
+var_match_T.group = [grp_str(1:length(var_match_rpe)); grp_str(16:16+length(var_match_te)-1); grp_str(1:length(var_match_rpe)); grp_str(16:16+length(var_match_te)-1)];
+var_match_T.time = [time1; time2];
+var_match_T.washout = [rpe_iw(var_match_rpe); te_iw(var_match_te); rpe_ew(var_match_rpe); te_ew(var_match_te)];
+var_match_T.variability = [rpe_var(var_match_rpe); te_var(var_match_te); rpe_var(var_match_rpe); te_var(var_match_te);];
+var_match_T.success = [rpe_success(var_match_rpe); te_success(var_match_te); rpe_success(var_match_rpe); te_success(var_match_te);]; 
+
+%Save table
 cd(group_dir);
 writetable(var_match_T, 'E1_var_match');
+
+%% Does baseline variability predict early learning? 
+
+%This code just runs the data extraction for variability and early learning
+%the python code plots and runs the stats
+
+T = [ET1; ET2];
+subjects = unique(T.SID,'stable');
+grp_str = {};  early_err = []; bsl_var = [];
+for i = 1:length(subjects)
+
+    %Record the group
+    if contains(subjects{i},'Reward')==1
+        grp_str = [grp_str; 'rpe'];
+    else
+        grp_str = [grp_str; 'te'];
+    end
+
+    %Indexing variable for experiment
+    if contains(subjects{i},'ER')==1
+        exp_idx(i,1) = 2;
+    else
+        exp_idx(i,1) = 1;
+    end
+
+    %Index phases
+    bsl_idx = find(strcmp(T.SID,subjects{i})==1 & strcmp(T.phase,'baseline')==1);
+    lrn_idx = find(strcmp(T.SID,subjects{i})==1 & strcmp(T.phase,'learning')==1);
+
+    %Calculcate baseline standard deviation (a la Wu et al., 2014)
+    bsl_lsl = T.prctLSL(bsl_idx);
+    bsl_lsl(isnan(bsl_lsl)==1) = [];
+    bsl_var(i,1) = std(bsl_lsl(end-159:end));
+
+    %Calculcate early learning as learning error once the target stops
+    %moving
+    lrn_lsl = T.prctLSL(lrn_idx);
+
+    %Index the target
+    target = T.Trgt_prct(lrn_idx);
+    steady_trgt_idx = find(target==10);
+
+    %Calculcate error
+    lrn_err = abs(lrn_lsl(steady_trgt_idx) - target(steady_trgt_idx));
+    early_err(i,1) = mean(lrn_err(1:50));
+
+end
+
+%Make table
+bsl_var_T = table;
+bsl_var_T.subj_id = subjects;
+bsl_var_T.group = grp_str;
+bsl_var_T.experiment = exp_idx;
+bsl_var_T.bsl_var = bsl_var;
+bsl_var_T.early_err = early_err;
+
+%Save table
+cd(group_dir);
+writetable(bsl_var_T, 'bsl_var');
+
+
+
+
