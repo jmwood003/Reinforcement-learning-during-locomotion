@@ -6,7 +6,8 @@ close all; clear all; clc;
 %Set directories and add paths
 group_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Data';
 doc_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Docs';
-fig_dir = '/Users/jonathanwood/Library/CloudStorage/OneDrive-SharedLibraries-UniversityofDelaware-o365/Team-CHS-PT-Morton Lab - RL in Locomotion - Jonathan - RL in Locomotion - Jonathan/Docs/Writing/Manuscript/Figures';
+% fig_dir = '/Users/jonathanwood/Library/CloudStorage/OneDrive-SharedLibraries-UniversityofDelaware-o365/Team-CHS-PT-Morton Lab - RL in Locomotion - Jonathan - RL in Locomotion - Jonathan/Docs/Writing/Manuscript/Figures';
+fig_dir = '/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Docs/Figures';
 addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis');
 addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis/Functions');
 addpath('/Users/jonathanwood/Documents/GitHub/Reinforcement-learning-during-locomotion/Code/GroupAnalysis/Functions/helper_functions');

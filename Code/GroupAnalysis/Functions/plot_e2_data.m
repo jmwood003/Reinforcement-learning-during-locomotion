@@ -153,8 +153,47 @@ annotation('rectangle',[0.73, 0.545, 0.0195, 0.05], 'FaceColor','w','EdgeColor',
 
 space = 40;
 
+%Retention error all strides
+axes('Position', [0.05, 0.07, 0.35, 0.35]); hold on
+rectangle('Position',[0, 1, short_phase(3), 8], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
+rectangle('Position',[space+1, 1, 25, 8], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
+s1 = shadedErrorBar(1:short_phase(3), nanmean(retention_err_5(rpe_idx,:)), SEM(retention_err_5(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
+s2 = shadedErrorBar(1:short_phase(3), nanmean(retention_err_5(te_idx,:)), SEM(retention_err_5(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
+set(s1.edge,'LineStyle','none'); set(s2.edge,'LineStyle','none');
+s3 = shadedErrorBar([1:short_phase(4)]+space, nanmean(retention_err_24(rpe_idx,:)), SEM(retention_err_24(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
+s4 = shadedErrorBar([1:short_phase(4)]+space, nanmean(retention_err_24(te_idx,:)), SEM(retention_err_24(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
+set(s3.edge,'LineStyle','none'); set(s4.edge,'LineStyle','none');
+xlim([0, short_phase(4)+space+100]); ylim([0, 10]);
+set(gca,'Box', 'off', 'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
+ylabel('\DeltaLSL Retention Error (%)','FontSize',18,'FontName','Ariel'); 
+xlabel('Strides','FontSize',18,'FontName','Ariel', 'FontWeight','normal')
+title('Retention Phase','FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
+text(short_phase(3)+8, 5, '24-hour break', 'Rotation',90, 'FontSize', 15,'Color','k', 'HorizontalAlignment', 'center', 'VerticalAlignment','middle');
+
+%Plot retention percent epoch
+x_jitter_rpe = normrnd(0.7,0.01,length(rpe_idx),1);
+x_jitter_te = normrnd(1.1,0.01,length(rpe_idx),1);
+dot_size = 25; lw = 2; cap_size_eb = 5;
+
+axes('Position', [0.34, 0.12, 0.15, 0.2]); hold on
+line([0.65, 0.95],[mean(Mean_absR5(rpe_idx)), mean(Mean_absR5(rpe_idx))],'LineWidth',lw,'Color',rpe_color);
+line([1.05, 1.35],[mean(Mean_absR5(te_idx)), mean(Mean_absR5(te_idx))],'LineWidth',lw,'Color',te_color);
+s1 = scatter(x_jitter_rpe, Mean_absR5(rpe_idx),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w','SizeData',dot_size);
+s2 = scatter(x_jitter_te, Mean_absR5(te_idx),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w','SizeData',dot_size);
+errorbar(0.8, mean(Mean_absR5(rpe_idx)), SEM(Mean_absR5(rpe_idx),1),'LineWidth',1.5,'Color',rpe_color, 'CapSize',cap_size_eb)
+errorbar(1.2, mean(Mean_absR5(te_idx)), SEM(Mean_absR5(te_idx),1),'LineWidth',1.5,'Color',te_color, 'CapSize',cap_size_eb)
+line([0.65, 0.95]+1,[mean(Mean_absR24(rpe_idx)), mean(Mean_absR24(rpe_idx))],'LineWidth',lw,'Color',rpe_color);
+line([1.05, 1.35]+1,[mean(Mean_absR24(te_idx)), mean(Mean_absR24(te_idx))],'LineWidth',lw,'Color',te_color);
+s3 = scatter(x_jitter_rpe+1, Mean_absR24(rpe_idx),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w','SizeData',dot_size);
+s4 = scatter(x_jitter_te+1, Mean_absR24(te_idx),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w','SizeData',dot_size);
+errorbar(1.8, mean(Mean_absR24(rpe_idx)), SEM(Mean_absR24(rpe_idx),1),'LineWidth',1.5,'Color',rpe_color, 'CapSize',cap_size_eb)
+errorbar(2.2, mean(Mean_absR24(te_idx)), SEM(Mean_absR24(te_idx),1),'LineWidth',1.5,'Color',te_color, 'CapSize',cap_size_eb)
+alpha(s1,.5); alpha(s2,.5); alpha(s3,.5); alpha(s4,.5); 
+xlim([0.5, 2.5]); ylim([0, 10]);
+set(gca,'XTick',[1,2],'XTickLabel',{'Immediate', '24-hour'},'Box', 'off', 'FontName','Ariel','FontSize',14, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
+
 %Retention percent all strides
-axes('Position', [0.05, 0.05, 0.35, 0.35]); hold on
+axes('Position', [0.55, 0.07, 0.35, 0.35]); hold on
 rectangle('Position',[0, 25, short_phase(3), 150], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
 rectangle('Position',[space+1, 25, 25, 150], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
 s1 = shadedErrorBar(1:short_phase(3), nanmean(prct_retention_5(rpe_idx,:)), SEM(prct_retention_5(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
@@ -168,15 +207,16 @@ plot([1:short_phase(4)]+space,ones(1,short_phase(4))*100,'k--','linewidth',1.5);
 xlim([0, short_phase(4)+space+100]); ylim([0, 200]);
 set(gca,'Box', 'off', 'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
 ylabel('Explicit Retention (%)','FontSize',18,'FontName','Ariel', 'FontWeight','normal');
+xlabel('Strides','FontSize',18,'FontName','Ariel', 'FontWeight','normal');
 title('Retention Phase','FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
 text(short_phase(3)+8, 100, '24-hour break', 'Rotation',90, 'FontSize', 15,'Color','k', 'HorizontalAlignment', 'center', 'VerticalAlignment','middle');
 
-%Plot retention percent epoch
+%Plot retention error epochs
 x_jitter_rpe = normrnd(0.7,0.01,length(rpe_idx),1);
 x_jitter_te = normrnd(1.1,0.01,length(rpe_idx),1);
 dot_size = 25; lw = 2; cap_size_eb = 5;
 
-axes('Position', [0.34, 0.12, 0.15, 0.2]); hold on
+axes('Position', [0.84, 0.12, 0.15, 0.2]); hold on
 plot(0:4,ones(5,1)*100,'k--','LineWidth',1.5);
 line([0.65, 0.95],[mean(mean_pR5(rpe_idx)), mean(mean_pR5(rpe_idx))],'LineWidth',lw,'Color',rpe_color);
 line([1.05, 1.35],[mean(mean_pR5(te_idx)), mean(mean_pR5(te_idx))],'LineWidth',lw,'Color',te_color);
@@ -194,48 +234,9 @@ alpha(s1,.5); alpha(s2,.5); alpha(s3,.5); alpha(s4,.5);
 xlim([0.5, 2.5]); ylim([0, 250]);
 set(gca,'XTick',[1,2],'XTickLabel',{'Immediate', '24-hour'},'Box', 'off', 'FontName','Ariel','FontSize',14, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
 
-%Retention error all strides
-axes('Position', [0.55, 0.05, 0.35, 0.35]); hold on
-rectangle('Position',[0, 1, short_phase(3), 8], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
-rectangle('Position',[space+1, 1, 25, 8], 'FaceColor','none','EdgeColor','k', 'LineWidth', 1);
-s1 = shadedErrorBar(1:short_phase(3), nanmean(retention_err_5(rpe_idx,:)), SEM(retention_err_5(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
-s2 = shadedErrorBar(1:short_phase(3), nanmean(retention_err_5(te_idx,:)), SEM(retention_err_5(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
-set(s1.edge,'LineStyle','none'); set(s2.edge,'LineStyle','none');
-s3 = shadedErrorBar([1:short_phase(4)]+space, nanmean(retention_err_24(rpe_idx,:)), SEM(retention_err_24(rpe_idx,:),1),'transparent',1,'lineProps',{'Color',rpe_color,'LineWidth',1});
-s4 = shadedErrorBar([1:short_phase(4)]+space, nanmean(retention_err_24(te_idx,:)), SEM(retention_err_24(te_idx,:),1),'transparent',1,'lineProps',{'Color',te_color,'LineWidth',1});
-set(s3.edge,'LineStyle','none'); set(s4.edge,'LineStyle','none');
-xlim([0, short_phase(4)+space+100]); ylim([0, 10]);
-set(gca,'Box', 'off', 'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
-ylabel('\DeltaLSL Retention Error (%)','FontSize',18,'FontName','Ariel'); 
-title('Retention Phase','FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
-text(short_phase(3)+8, 5, '24-hour break', 'Rotation',90, 'FontSize', 15,'Color','k', 'HorizontalAlignment', 'center', 'VerticalAlignment','middle');
-
-%Plot retention error epochs
-x_jitter_rpe = normrnd(0.7,0.01,length(rpe_idx),1);
-x_jitter_te = normrnd(1.1,0.01,length(rpe_idx),1);
-dot_size = 25; lw = 2; cap_size_eb = 5;
-
-axes('Position', [0.84, 0.12, 0.15, 0.2]); hold on
-line([0.65, 0.95],[mean(Mean_absR5(rpe_idx)), mean(Mean_absR5(rpe_idx))],'LineWidth',lw,'Color',rpe_color);
-line([1.05, 1.35],[mean(Mean_absR5(te_idx)), mean(Mean_absR5(te_idx))],'LineWidth',lw,'Color',te_color);
-s1 = scatter(x_jitter_rpe, Mean_absR5(rpe_idx),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w','SizeData',dot_size);
-s2 = scatter(x_jitter_te, Mean_absR5(te_idx),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w','SizeData',dot_size);
-errorbar(0.8, mean(Mean_absR5(rpe_idx)), SEM(Mean_absR5(rpe_idx),1),'LineWidth',1.5,'Color',rpe_color, 'CapSize',cap_size_eb)
-errorbar(1.2, mean(Mean_absR5(te_idx)), SEM(Mean_absR5(te_idx),1),'LineWidth',1.5,'Color',te_color, 'CapSize',cap_size_eb)
-line([0.65, 0.95]+1,[mean(Mean_absR24(rpe_idx)), mean(Mean_absR24(rpe_idx))],'LineWidth',lw,'Color',rpe_color);
-line([1.05, 1.35]+1,[mean(Mean_absR24(te_idx)), mean(Mean_absR24(te_idx))],'LineWidth',lw,'Color',te_color);
-s3 = scatter(x_jitter_rpe+1, Mean_absR24(rpe_idx),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w','SizeData',dot_size);
-s4 = scatter(x_jitter_te+1, Mean_absR24(te_idx),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w','SizeData',dot_size);
-errorbar(1.8, mean(Mean_absR24(rpe_idx)), SEM(Mean_absR24(rpe_idx),1),'LineWidth',1.5,'Color',rpe_color, 'CapSize',cap_size_eb)
-errorbar(2.2, mean(Mean_absR24(te_idx)), SEM(Mean_absR24(te_idx),1),'LineWidth',1.5,'Color',te_color, 'CapSize',cap_size_eb)
-alpha(s1,.5); alpha(s2,.5); alpha(s3,.5); alpha(s4,.5); 
-xlim([0.5, 2.5]); ylim([0, 10]);
-set(gca,'XTick',[1,2],'XTickLabel',{'Immediate', '24-hour'},'Box', 'off', 'FontName','Ariel','FontSize',14, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
-% title('Epochs','FontSize',16,'FontName','Ariel', 'FontWeight', 'normal');
-
 annotation('textbox',[0, 0.81, 0.2, 0.2], 'String', 'A','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0, 0.27, 0.2, 0.2], 'String', 'B','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
-annotation('textbox',[0.5, 0.27, 0.2, 0.2], 'String', 'C','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
+annotation('textbox',[0.49, 0.27, 0.2, 0.2], 'String', 'C','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 
 %Save figure
 cd(fig_dir);
