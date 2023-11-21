@@ -157,7 +157,7 @@ cd(group_dir);
 subjs_to_plot = {'VisualFB_04','VisualFB_10','VisualFB_20',...
     'RewardFB_07','RewardFB_30','RewardFB_27'};
 
-plot_random_learning(ET1, subjs_to_plot);
+plot_individual_learning(ET1, subjs_to_plot);
 
 %Save figure
 cd(fig_dir);
@@ -356,9 +356,14 @@ for i = 1:length(subjects)
     lrn_idx = find(strcmp(T.SID,subjects{i})==1 & strcmp(T.phase,'learning')==1);
 
     %Calculcate baseline standard deviation (a la Wu et al., 2014)
-    bsl_lsl = T.prctLSL(bsl_idx);
+    bsl_lsl = T.prctLSL(bsl_idx); %percent LSL
     bsl_lsl(isnan(bsl_lsl)==1) = [];
     bsl_var(i,1) = std(bsl_lsl(end-159:end));
+
+    %Calculcate baseline standard deviation of LSL
+    bsl_lsl_raw = T.LSL(bsl_idx)*100; %Taking LSL in meters
+    bsl_lsl_raw(isnan(bsl_lsl_raw)==1) = [];
+    bsl_var_lsl(i,1) = std(bsl_lsl_raw(end-159:end));
 
     %Calculcate early learning as learning error once the target stops
     %moving
@@ -374,18 +379,96 @@ for i = 1:length(subjects)
 
 end
 
+range(bsl_var_lsl)
+
 %Make table
-bsl_var_T = table;
-bsl_var_T.subj_id = subjects;
-bsl_var_T.group = grp_str;
-bsl_var_T.experiment = exp_idx;
-bsl_var_T.bsl_var = bsl_var;
-bsl_var_T.early_err = early_err;
+success_T = table;
+success_T.subj_id = subjects;
+success_T.group = grp_str;
+success_T.experiment = exp_idx;
+success_T.bsl_var = bsl_var;
+success_T.early_err = early_err;
+success_T.bsl_var_lsl = bsl_var_lsl;
 
 %Save table
 cd(group_dir);
-writetable(bsl_var_T, 'bsl_var');
+writetable(success_T, 'bsl_var');
 
+%% Success and aftereffect / retention
 
+T = [ET1; ET2];
+subjects = unique(T.SID,'stable');
+grp_str = {}; washout = [];
+ret5_error = []; ret24_error = [];
+for i = 1:length(subjects)
 
+    %Record the group
+    if contains(subjects{i},'Reward')==1
+        grp_str = [grp_str; 'rpe'];
+    else
+        grp_str = [grp_str; 'te'];
+    end
+
+    %Index phases
+    lrn_idx = find(strcmp(T.SID,subjects{i})==1 & strcmp(T.phase,'learning')==1);
+    wsh_idx = find(strcmp(T.SID,subjects{i})==1 & strcmp(T.phase,'washout')==1);
+    ret5_idx = find(strcmp(T.SID,subjects{i})==1 & strcmp(T.phase,'Retention5min')==1);
+    ret24_idx = find(strcmp(T.SID,subjects{i})==1 & strcmp(T.phase,'Retention24Hr')==1);
+
+    %Index learning plateau
+    LrnPC = T.prctLSL(lrn_idx);
+    nan_idx = find(isnan(LrnPC)==1);
+    LrnPC(nan_idx) = [];
+    target = T.Trgt_prct(lrn_idx);
+    target(nan_idx)= [];
+    maxPerturbIdx = find(target==10);    
+    end_learning = mean(LrnPC(end-49:end));
+
+    %Success
+    learning_success = T.Success(lrn_idx);
+    learning_success(nan_idx)= [];
+    success(i,1) = (sum(learning_success(maxPerturbIdx))/length(maxPerturbIdx))*100;
+
+    %Indexing variable for experiment
+    if contains(subjects{i},'ER')==1
+
+        exp_idx(i,1) = 2;
+
+        %Washout
+        washout = [washout; nan];
+
+        %Retention
+        ret5_error = [ret5_error; abs(nanmean(T.prctLSL(ret5_idx)) - end_learning)];
+        ret24_lsl = T.prctLSL(ret24_idx);
+        ret24_lsl(isnan(ret24_lsl)==1) = [];
+        ret24_error = [ret24_error; abs(nanmean(ret24_lsl(1:25) - end_learning))];
+            
+    else
+
+        exp_idx(i,1) = 1;
+
+        %Washout
+        washout = [washout; (mean(T.prctLSL(wsh_idx(1:10))) / end_learning)*100];
+        
+        %Retention
+        ret5_error = [ret5_error; nan];
+        ret24_error = [ret24_error; nan];
+
+    end
+
+end
+
+%Make table
+success_T = table;
+success_T.subj_id = subjects;
+success_T.group = grp_str;
+success_T.experiment = exp_idx;
+success_T.success = success;
+success_T.washout = washout;
+success_T.ret5_error = ret5_error;
+success_T.ret24_error = ret24_error;
+
+%Save table
+cd(group_dir);
+writetable(success_T, 'success_T');
 
