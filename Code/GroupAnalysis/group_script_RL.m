@@ -159,6 +159,8 @@ subjs_to_plot = {'VisualFB_04','VisualFB_10','VisualFB_20',...
 
 plot_individual_learning(ET1, subjs_to_plot);
 
+max_sd_plot(ET1, 50);
+
 %Save figure
 cd(fig_dir);
 print('Figure_2','-dtiff', '-r300');
