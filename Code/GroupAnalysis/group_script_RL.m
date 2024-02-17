@@ -153,13 +153,8 @@ cd(group_dir);
 
 %% Individual learning data - Figure 2
 
-%Plot 3 specific individuals 
-subjs_to_plot = {'VisualFB_04','VisualFB_10','VisualFB_20',...
-    'RewardFB_07','RewardFB_30','RewardFB_27'};
-
-plot_individual_learning(ET1, subjs_to_plot);
-
-max_sd_plot(ET1, 50);
+plot_percentiles = [10, 50, 90];
+plot_individual_learning(ET1, plot_percentiles);
 
 %Save figure
 cd(fig_dir);
@@ -261,6 +256,38 @@ te_iw = init_wsh(strcmp(grp_str,'te')==1);
 rpe_ew = early_wsh(strcmp(grp_str,'rpe')==1);
 te_ew = early_wsh(strcmp(grp_str,'te')==1);
 
+%Match the particiapnts by success
+[success_match_rpe, success_match_te] = unique_matches(rpe_success, te_success);
+%Plot the washout
+x_jitter_rpe = normrnd(0.75,0.01,length(success_match_rpe),1);
+x_jitter_te = normrnd(1.15,0.01,length(success_match_te),1);
+figure('Color', 'w'); hold on
+plot(0:4,zeros(5,1),'k-','LineWidth',1);
+line([0.65, 0.95],[mean(rpe_iw(success_match_rpe)), mean(rpe_iw(success_match_rpe))],'LineWidth',4,'Color',rpe_color);
+line([1.05, 1.35],[mean(te_iw(success_match_te)), mean(te_iw(success_match_te))],'LineWidth',4,'Color',te_color);
+errorbar(0.8, mean(rpe_iw(success_match_rpe)), SEM(rpe_iw(success_match_rpe),1),'LineWidth',2,'Color',rpe_color, 'CapSize',cap_size_eb)
+errorbar(1.2, mean(te_iw(success_match_te)), SEM(te_iw(success_match_te),1),'LineWidth',2,'Color',te_color, 'CapSize',cap_size_eb)
+s1 = scatter(x_jitter_rpe, rpe_iw(success_match_rpe),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+s2 = scatter(x_jitter_te, te_iw(success_match_te),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+line([0.65, 0.95]+1,[mean(rpe_ew(success_match_rpe)), mean(rpe_ew(success_match_rpe))],'LineWidth',4,'Color',rpe_color);
+line([1.05, 1.35]+1,[mean(te_ew(success_match_te)), mean(te_ew(success_match_te))],'LineWidth',4,'Color',te_color);
+s3 = scatter(x_jitter_rpe+1, rpe_ew(success_match_rpe),'o','MarkerFaceColor',rpe_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+s4 = scatter(x_jitter_te+1, te_ew(success_match_te),'o','MarkerFaceColor',te_color, 'MarkerEdgeColor','w', 'SizeData', dot_size);
+errorbar(1.8, mean(rpe_ew(success_match_rpe)), SEM(rpe_ew(success_match_rpe),1),'LineWidth',2,'Color',rpe_color, 'CapSize',cap_size_eb)
+errorbar(2.2, mean(te_ew(success_match_te)), SEM(te_ew(success_match_te),1),'LineWidth',2,'Color',te_color, 'CapSize',cap_size_eb)
+alpha(s1,.5); alpha(s2,.5); alpha(s3,.5); alpha(s4,.5); 
+xlim([0.5, 2.5]); %ylim([-100, 100]);
+set(gca,'XTick',[1,2],'XTickLabel',{'Initial', 'Early'},'Box', 'off', 'FontName','Ariel','FontSize',18, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1);
+ylabel('Percent retention','FontSize',20,'FontName','Ariel', 'FontWeight','normal');
+title('Implicit Aftereffect - Matched for success','FontWeight','normal','FontSize',25,'FontName','Ariel', 'Color', 'k');
+
+%Make table for comparison
+success_match_T = table;
+success_match_T.subj_id = [subjects(success_match_rpe); subjects(success_match_te)];
+success_match_T.group = [grp_str(success_match_rpe); grp_str(success_match_te)];
+success_match_T.washout = [rpe_iw(success_match_rpe); te_iw(success_match_te)];
+
+
 %Match the particiapnts by variability
 [var_match_rpe, var_match_te] = unique_matches(rpe_var, te_var);
 
@@ -328,6 +355,7 @@ var_match_T.success = [rpe_success(var_match_rpe); te_success(var_match_te); rpe
 %Save table
 cd(group_dir);
 writetable(var_match_T, 'E1_var_match');
+writetable(success_match_T, 'E1_success_match');
 
 %% Does baseline variability predict early learning? 
 
@@ -402,6 +430,8 @@ T = [ET1; ET2];
 subjects = unique(T.SID,'stable');
 grp_str = {}; washout = [];
 ret5_error = []; ret24_error = [];
+ret5_prct = []; ret24_prct = [];
+success = [];
 for i = 1:length(subjects)
 
     %Record the group
@@ -431,6 +461,9 @@ for i = 1:length(subjects)
     learning_success(nan_idx)= [];
     success(i,1) = (sum(learning_success(maxPerturbIdx))/length(maxPerturbIdx))*100;
 
+    %Variability 
+    learning_var(i,1) = std(LrnPC(maxPerturbIdx));
+
     %Indexing variable for experiment
     if contains(subjects{i},'ER')==1
 
@@ -444,7 +477,10 @@ for i = 1:length(subjects)
         ret24_lsl = T.prctLSL(ret24_idx);
         ret24_lsl(isnan(ret24_lsl)==1) = [];
         ret24_error = [ret24_error; abs(nanmean(ret24_lsl(1:25) - end_learning))];
-            
+        
+        ret5_prct = [ret5_prct; (nanmean(T.prctLSL(ret5_idx))/end_learning)*100];
+        ret24_prct = [ret24_prct; (nanmean(ret24_lsl(1:25))/end_learning)*100];
+           
     else
 
         exp_idx(i,1) = 1;
@@ -455,6 +491,8 @@ for i = 1:length(subjects)
         %Retention
         ret5_error = [ret5_error; nan];
         ret24_error = [ret24_error; nan];
+        ret5_prct = [ret5_prct; nan];
+        ret24_prct = [ret24_prct; nan];
 
     end
 
@@ -466,9 +504,12 @@ success_T.subj_id = subjects;
 success_T.group = grp_str;
 success_T.experiment = exp_idx;
 success_T.success = success;
+success_T.variability = learning_var;
 success_T.washout = washout;
 success_T.ret5_error = ret5_error;
 success_T.ret24_error = ret24_error;
+success_T.ret5_prct = ret5_prct;
+success_T.ret24_prct = ret24_prct;
 
 %Save table
 cd(group_dir);

@@ -100,7 +100,7 @@ text(16, 9, 'RPE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color
 text(16, 8.2, 'TE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color',te_color);
 text(StartMoving+0.5,9,{'Gadual'; 'Target'; 'Shift'},'FontSize',16, 'FontName','Arial','Color','k','Rotation',0,'HorizontalAlignment','center','VerticalAlignment','middle');
 set(gca,'FontSize',18, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-title('Learning Variability','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
+title('Exploration','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
 ylabel('\sigma_{\DeltaLSL}','FontSize',25,'FontName','Ariel'); 
 xlabel(['Strides (bins of ' num2str(BinSize) ')'],'FontSize',20,'FontName','Ariel');
 
@@ -113,7 +113,7 @@ plot(1:2, mean(var_epochs(GrpIdx==2 & exp_idx==1,:)),'Color',te_color, 'LineWidt
 xlim([0.5, 2.5]); ylim([0 15]);
 set(gca,'FontSize',18, 'FontName','Arial', 'XTick', [1,2], 'XTickLabel', {'Early','Late'}, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 ylabel('\sigma_{\DeltaLSL}','FontSize',25,'FontName','Ariel'); 
-title({'Early vs Late'; 'Variability'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
+title({'Early vs Late'; 'Exploration'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
 
 %Plot exploration
 axes('Position', [0.6, 0.1, 0.25, 0.3]); hold on
@@ -153,7 +153,7 @@ text(16, 9, 'RPE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color
 text(16, 8.2, 'TE', 'FontName','Arial','FontSize',20, 'FontWeight','bold', 'Color',te_color);
 text(StartMoving+0.5,9,{'Gadual'; 'Target'; 'Shift'},'FontSize',16, 'FontName','Arial','Color','k','Rotation',0,'HorizontalAlignment','center','VerticalAlignment','middle');
 set(gca,'FontSize',18, 'FontName', 'Arial', 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
-title('Learning Variability - Experiment 2','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
+title('Exploration - Experiment 2','FontSize',30,'FontName','Ariel', 'FontWeight', 'bold');
 ylabel('\sigma_{\DeltaLSL}','FontSize',25,'FontName','Ariel'); 
 xlabel(['Strides (bins of ' num2str(BinSize) ')'],'FontSize',20,'FontName','Ariel');
 
@@ -166,7 +166,7 @@ plot(1:2, mean(var_epochs(GrpIdx==2 & exp_idx==2,:)),'Color',te_color, 'LineWidt
 xlim([0.5, 2.5]); ylim([0 10]);
 set(gca,'FontSize',18, 'FontName','Arial', 'XTick', [1,2], 'XTickLabel', {'Early','Late'}, 'XColor', 'k', 'YColor','k', 'Layer', 'top', 'Color', 'none', 'LineWidth', 1); 
 ylabel('\sigma_{\DeltaLSL}','FontSize',25,'FontName','Ariel'); 
-title({'Early vs Late'; 'Variability'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
+title({'Early vs Late'; 'Exploration'},'FontSize',20,'FontName','Ariel', 'FontWeight', 'normal');
 
 %Plot exploration
 axes('Position', [0.6, 0.1, 0.25, 0.3]); hold on
