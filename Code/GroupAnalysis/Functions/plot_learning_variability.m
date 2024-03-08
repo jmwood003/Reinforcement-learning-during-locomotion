@@ -131,9 +131,9 @@ annotation('textbox',[0.02, 0.81, 0.2, 0.2], 'String', 'A','FontName','Arial','F
 annotation('textbox',[0.08, 0.27, 0.2, 0.2], 'String', 'B','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0.53, 0.27, 0.2, 0.2], 'String', 'C','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 
-%save figure
-cd(fig_dir);
-print('Figure_4','-dtiff', '-r300');
+% %save figure
+% cd(fig_dir);
+% print('Figure_4','-dtiff', '-r300');
 
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
@@ -183,9 +183,9 @@ annotation('textbox',[0.02, 0.81, 0.2, 0.2], 'String', 'A','FontName','Arial','F
 annotation('textbox',[0.08, 0.27, 0.2, 0.2], 'String', 'B','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 annotation('textbox',[0.53, 0.27, 0.2, 0.2], 'String', 'C','FontName','Arial','FontWeight', 'bold', 'BackgroundColor','none','EdgeColor','none', 'FontSize', 40);
 
-%save figure
-cd(fig_dir);
-print('Figure_S2','-dtiff', '-r300');
+% %save figure
+% cd(fig_dir);
+% print('Figure_S2','-dtiff', '-r300');
 
 %Make tables 
 anova_T = table;

@@ -1,4 +1,5 @@
 function ET = EventDetection(T)
+
 %This function detects heel strike and toe off events using the derivative
 %of the marker as it crosses 0. Moving from negative to positive equals 
 %toe off. Moving from postive to negative equals heel strike. Also cross 
